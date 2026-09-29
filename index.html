@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>长尾渠道 AI 值守系统 · 交互 Demo</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700;900&family=JetBrains+Mono:wght@400;600;800&display=swap');
+:root{
+  --c1:#4d84d4; --c1glow:rgba(77,132,212,.45); --c2:#c96a42; --c3:#2fa87b; --c4:#8868cf;
+  --bg:#0d1220; --bg2:#111830; --card:#141c31; --card2:#182242;
+  --line:#232f52; --line2:#2c3a63;
+  --ink:#e8ecf7; --ink2:#9aa7c7; --ink3:#5f6d94;
+  --good:#2fa87b; --warn:#d9a406; --bad:#e06058;
+  --mono:'JetBrains Mono',ui-monospace,monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:'Noto Sans SC',-apple-system,'PingFang SC',sans-serif;background:var(--bg);color:var(--ink);padding:0 0 70px;min-height:100vh;
+  background-image:radial-gradient(ellipse 80% 50% at 50% -10%,rgba(77,132,212,.13),transparent),radial-gradient(ellipse 60% 40% at 85% 110%,rgba(136,104,207,.08),transparent)}
+.wrap{max-width:1080px;margin:0 auto;padding:0 22px}
+::selection{background:var(--c1glow)}
+
+/* ===== 顶部 ===== */
+header{padding:38px 0 8px;position:relative}
+.live{display:inline-flex;align-items:center;gap:8px;font-family:var(--mono);font-size:11px;letter-spacing:2px;color:var(--c1);border:1px solid var(--line2);padding:5px 14px;border-radius:20px;background:rgba(77,132,212,.08)}
+.live .dot{width:7px;height:7px;border-radius:50%;background:var(--c3);box-shadow:0 0 8px var(--c3);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+h1{font-size:30px;font-weight:900;letter-spacing:1px;margin:16px 0 6px;background:linear-gradient(105deg,#fff 30%,#9fc3f0);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.sub{color:var(--ink2);font-size:13.5px;line-height:1.8;max-width:760px}
+.sub b{color:var(--ink);font-weight:600}
+.meta{display:flex;gap:18px;flex-wrap:wrap;margin-top:12px;font-family:var(--mono);font-size:11px;color:var(--ink3)}
+.meta span b{color:var(--ink2)}
+
+/* ===== 分步导航 ===== */
+.tabs{display:flex;gap:6px;margin:26px 0 20px;position:sticky;top:0;z-index:40;background:linear-gradient(var(--bg) 82%,transparent);padding:10px 0 12px;flex-wrap:wrap}
+.tab{padding:9px 16px;border:1px solid var(--line);border-radius:9px;background:var(--card);cursor:pointer;font-size:13px;color:var(--ink2);transition:all .2s;position:relative}
+.tab:hover{border-color:var(--c1);color:var(--ink);transform:translateY(-1px)}
+.tab.on{background:linear-gradient(135deg,rgba(77,132,212,.22),rgba(77,132,212,.08));color:#fff;border-color:var(--c1);font-weight:600;box-shadow:0 0 18px rgba(77,132,212,.25)}
+.tab .step{font-family:var(--mono);font-size:10px;color:var(--c1);margin-right:6px}
+
+/* ===== 面板与卡片 ===== */
+.panel{display:none}
+.panel.on{display:block;animation:up .4s cubic-bezier(.2,.8,.2,1)}
+@keyframes up{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.card{background:linear-gradient(180deg,var(--card2),var(--card));border:1px solid var(--line);border-radius:14px;padding:20px 22px;margin-bottom:16px;position:relative;overflow:hidden}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(77,132,212,.5),transparent)}
+.card h3{font-size:15.5px;font-weight:700;display:flex;align-items:center;gap:9px}
+.card h3 .ln{color:var(--c1);font-family:var(--mono);font-size:11px;letter-spacing:2px;font-weight:600;border:1px solid var(--line2);padding:2px 8px;border-radius:5px;background:rgba(77,132,212,.1)}
+.note{font-size:12px;color:var(--ink3);margin:7px 0 14px;line-height:1.7}
+.note b{color:var(--ink2)}
+
+/* ===== KPI ===== */
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(165px,1fr));gap:12px;margin-bottom:16px}
+.kpi{background:linear-gradient(180deg,var(--card2),var(--card));border:1px solid var(--line);border-radius:12px;padding:16px 17px;transition:all .25s;position:relative;overflow:hidden}
+.kpi:hover{border-color:var(--c1);transform:translateY(-3px);box-shadow:0 8px 26px rgba(13,18,32,.6)}
+.kpi::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--c1),transparent);opacity:0;transition:.25s}
+.kpi:hover::after{opacity:1}
+.kpi .v{font-family:var(--mono);font-size:26px;font-weight:800;letter-spacing:-.5px;color:#fff;text-shadow:0 0 22px var(--c1glow)}
+.kpi .v small{font-size:13px;font-weight:600;color:var(--ink2)}
+.kpi .l{font-size:12px;color:var(--ink2);margin-top:3px}
+.kpi .d{font-size:10.5px;margin-top:5px;color:var(--ink3);font-family:var(--mono)}
+.kpi .d .up{color:var(--good)} .kpi .d .dn{color:var(--bad)}
+
+/* ===== 折线 ===== */
+.chart{position:relative;height:210px;margin-top:10px}
+.chart svg{width:100%;height:100%;display:block}
+.tip{position:absolute;pointer-events:none;background:#0a0f1e;border:1px solid var(--line2);color:var(--ink);font-family:var(--mono);font-size:11.5px;padding:7px 11px;border-radius:8px;transform:translate(-50%,-120%);white-space:nowrap;display:none;z-index:5;box-shadow:0 6px 20px rgba(0,0,0,.5)}
+.tip b{color:#fff}
+.glow-line{filter:drop-shadow(0 0 6px var(--c1glow))}
+
+/* ===== 流程步 ===== */
+.flow{display:flex;gap:0;flex-wrap:wrap;margin-top:4px}
+.step{flex:1;min-width:180px;padding:15px 16px;border:1px solid var(--line);border-radius:12px;background:var(--card);position:relative;margin:0 30px 12px 0;transition:all .25s}
+.step:hover{border-color:var(--c1);transform:translateY(-2px)}
+.step::after{content:'';position:absolute;right:-24px;top:50%;width:18px;height:2px;background:linear-gradient(90deg,var(--c1),transparent);transform:translateY(-50%)}
+.step::before{content:'▸';position:absolute;right:-26px;top:50%;transform:translateY(-58%);color:var(--c1);font-size:12px}
+.step:last-child{margin-right:0}
+.step:last-child::after,.step:last-child::before{display:none}
+.step .no{font-family:var(--mono);font-size:10px;color:var(--c1);font-weight:700;letter-spacing:1.5px}
+.step b{display:block;font-size:14px;margin:4px 0 6px}
+.step p{font-size:12px;color:var(--ink2);line-height:1.7}
+.step .src{display:inline-block;margin-top:8px;font-family:var(--mono);font-size:10px;color:var(--ink3);background:var(--bg2);border:1px dashed var(--line2);padding:3px 9px;border-radius:5px}
+.step .src.on{color:var(--good);border-color:rgba(47,168,123,.4)}
+.step .src.plan{color:var(--warn);border-color:rgba(217,164,6,.4)}
+
+/* ===== 表格 ===== */
+.tblwrap{overflow-x:auto;border:1px solid var(--line);border-radius:10px}
+table{width:100%;border-collapse:collapse;font-size:12.5px;min-width:760px}
+th{text-align:left;color:var(--ink3);font-weight:600;font-family:var(--mono);font-size:10.5px;letter-spacing:1px;padding:11px 12px;border-bottom:1px solid var(--line2);background:var(--bg2);white-space:nowrap}
+td{padding:11px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+tr:last-child td{border-bottom:none}
+tbody tr{transition:background .15s}
+tbody tr:hover{background:rgba(77,132,212,.07)}
+.tag{display:inline-block;padding:3px 10px;border-radius:5px;font-size:11px;font-weight:600;white-space:nowrap;font-family:var(--mono)}
+.t-act{background:rgba(77,132,212,.16);color:#8ab6ee;border:1px solid rgba(77,132,212,.35)}
+.t-cat{background:rgba(154,167,199,.1);color:var(--ink2);border:1px solid var(--line2)}
+.evi{color:var(--ink3);font-size:11px;line-height:1.6;font-family:var(--mono);max-width:330px}
+.why{color:var(--ink2);font-size:12px;line-height:1.6;max-width:250px}
+td .spu{font-family:var(--mono);font-weight:600;color:#fff}
+
+/* ===== 条形 ===== */
+.bars{margin-top:8px}
+.brow{display:flex;align-items:center;gap:12px;margin:9px 0}
+.bname{width:76px;font-size:12px;color:var(--ink2);text-align:right;flex-shrink:0}
+.btrack{flex:1;background:rgba(35,47,82,.5);border-radius:5px;height:20px;overflow:hidden;position:relative}
+.bfill{height:100%;border-radius:5px;background:linear-gradient(90deg,var(--c1),#6ba0e8);box-shadow:0 0 12px var(--c1glow);transform-origin:left;animation:grow .8s cubic-bezier(.2,.8,.2,1) backwards}
+.bfill.neg{background:linear-gradient(90deg,#b34f47,var(--bad));box-shadow:0 0 10px rgba(224,96,88,.3)}
+.bfill.zero{background:var(--ink3);box-shadow:none}
+@keyframes grow{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+.bval{width:88px;font-family:var(--mono);font-size:11.5px;font-weight:600;color:var(--ink)}
+
+/* ===== 解释卡 ===== */
+.explain{background:linear-gradient(135deg,rgba(47,168,123,.08),rgba(47,168,123,.02));border:1px solid rgba(47,168,123,.3);border-radius:12px;padding:17px 19px;font-size:13.5px;line-height:2;position:relative}
+.explain::before{content:'';position:absolute;left:0;top:14px;bottom:14px;width:3px;border-radius:3px;background:linear-gradient(var(--c3),transparent)}
+.explain .who{font-family:var(--mono);font-size:10.5px;color:var(--c3);font-weight:700;letter-spacing:2px;margin-bottom:6px}
+.explain b{color:#fff}
+.explain .dim{color:var(--ink2)}
+
+/* ===== AB 对照 ===== */
+.vs{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.vs>div{border-radius:13px;padding:18px 19px;border:1px solid var(--line);position:relative;overflow:hidden;transition:.25s}
+.vs .before{background:linear-gradient(135deg,rgba(217,164,6,.07),transparent)}
+.vs .after{background:linear-gradient(135deg,rgba(77,132,212,.12),rgba(77,132,212,.03));border-color:rgba(77,132,212,.4)}
+.vs .after:hover,.vs .before:hover{transform:translateY(-2px)}
+.vs h4{font-size:12px;margin-bottom:10px;font-family:var(--mono);letter-spacing:1px}
+.vs .before h4{color:var(--warn)}
+.vs .after h4{color:var(--c1)}
+.big{font-family:var(--mono);font-size:34px;font-weight:800;letter-spacing:-1px}
+.vs .before .big{color:var(--warn);text-shadow:0 0 24px rgba(217,164,6,.25)}
+.vs .after .big{color:#fff;text-shadow:0 0 28px var(--c1glow)}
+.vs .big small{font-size:14px;font-weight:600;color:var(--ink2)}
+.vs .cap{font-size:12px;color:var(--ink2);margin:3px 0 10px}
+.vs li{font-size:12.5px;color:var(--ink2);margin:6px 0 6px 16px;line-height:1.6;list-style:none;position:relative}
+.vs li::before{content:'—';position:absolute;left:-16px;color:var(--ink3)}
+.honest{margin-top:14px;font-size:11.5px;color:var(--ink3);line-height:1.8;border:1px dashed var(--line2);border-radius:9px;padding:11px 14px}
+.honest b{color:var(--ink2)}
+
+/* ===== 页脚 ===== */
+.foot{margin-top:30px;font-size:11px;color:var(--ink3);line-height:1.9;border-top:1px solid var(--line);padding-top:16px;font-family:var(--mono)}
+@media(max-width:760px){.vs{grid-template-columns:1fr}.step{margin-right:0}.step::after,.step::before{display:none}h1{font-size:24px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="live"><span class="dot"></span>SYSTEM LIVE · DEMO REPLAY</div>
+  <h1>长尾渠道 AI 值守系统</h1>
+  <p class="sub">宁波美鹰 · 销售中心-多渠道团队 —— 1 名运营用 AI 值守 13 个欧洲电商渠道的上架、改价、库存、竞品分析与下班客服。本页数字<b>全部来自系统真实运行台账</b>（飞书多维表格 + SQLite 决策日志 + 客服 AB 抽数），非模拟数据。</p>
+  <div class="meta"><span>主战场 <b>Allegro PL</b></span><span>数据日 <b>2026-09-27</b></span><span>决策日志 <b>323 单</b></span><span>客服 AB 样本 <b>n=167</b></span><span>参赛 <b>2026 AI 先锋 · 海外赛道</b></span></div>
+</header>
+
+<div class="tabs">
+  <div class="tab on" data-p="p1"><span class="step">01</span>感知层 · 每日数据</div>
+  <div class="tab" data-p="p2"><span class="step">02</span>判断层 · AI 动作单</div>
+  <div class="tab" data-p="p3"><span class="step">03</span>授权 · 两级闸门</div>
+  <div class="tab" data-p="p4"><span class="step">04</span>复盘 · 昨日解释</div>
+  <div class="tab" data-p="p5"><span class="step">05</span>效果 · 客服 AB 实测</div>
+</div>
+
+<!-- ① -->
+<div class="panel on" id="p1">
+  <div class="card">
+    <h3><span class="ln">LAYER 01</span>感知层 · 单日经营全景</h3>
+    <div class="note">数据源：Allegro 后台 15 分钟直拉 + ERP 导出 + 飞书底表，每日 12 步自动流水线写入台账。以下为 <b>2026-09-27</b> 真实数据。</div>
+    <div class="kpis" id="kpis"></div>
+    <div class="chart" id="line7"><svg preserveAspectRatio="none" viewBox="0 0 1000 210"></svg><div class="tip"></div></div>
+    <div class="note" style="margin-top:8px">近 7 日单日销售额（PLN 含 VAT）· 悬停查看明细 · 数据源：explain_daily 台账</div>
+  </div>
+</div>
+
+<!-- ② -->
+<div class="panel" id="p2">
+  <div class="card">
+    <h3><span class="ln">LAYER 02</span>判断层 · 每日动作单（真实记录）</h3>
+    <div class="note">AI 分诊器每天对每个 SPU 输出「动作 + 理由 + 证据」，写入飞书「决策日志」表。以下 6 条为 2026-09-24 ~ 09-27 真实开单（累计 <b>323</b> 条）。</div>
+    <div class="tblwrap"><table id="dl">
+      <thead><tr><th>日期</th><th>SPU</th><th>品类</th><th>AI 动作</th><th>判断理由（AI 生成）</th><th>证据（系统实测）</th></tr></thead>
+      <tbody></tbody></table></div>
+  </div>
+  <div class="card">
+    <h3><span class="ln">DISTRIB</span>累计 323 条提案的动作分布</h3>
+    <div class="note">2026-09-04 上线至今全部开单记录</div>
+    <div class="bars" id="actbars"></div>
+  </div>
+</div>
+
+<!-- ③ -->
+<div class="panel" id="p3">
+  <div class="card">
+    <h3><span class="ln">LAYER 03</span>授权层 · 两级闸门</h3>
+    <div class="note">判断层 <b>2026-10-18 起灰度</b>；当前全部动作走 L2 人工审批——与正文口径一致：<b>323/323 条为「待处理」，无一条自动执行</b>。</div>
+    <div class="flow">
+      <div class="step"><span class="no">L3 · 长尾渠道</span><b>策略卡内自动执行</b><p>每个渠道一张策略卡：品类白名单、底线价、分配上限、越界条件。人批一次，卡内自治，越界叫人。</p><span class="src plan">STATUS: 10-18 起灰度</span></div>
+      <div class="step"><span class="no">L2 · 主战场</span><b>飞书审批卡 · 人翻「已同意」</b><p>改价 / 改库存 / 上下架必须人工在飞书表翻状态，本模块不执行任何前台动作。</p><span class="src on">STATUS: 现行 · 323/323 人工</span></div>
+      <div class="step"><span class="no">GUARDRAIL</span><b>硬数字不经模型</b><p>库存非负、售价不低于底线价、合规黑名单——全部由代码硬门拦截，模型碰不到这些字段。</p><span class="src on">STATUS: 现行</span></div>
+    </div>
+  </div>
+  <div class="card">
+    <h3><span class="ln">WRITEBACK</span>7 日回写机制（运行中）</h3>
+    <div class="note">每条决定（执行或忽略）满 7 天自动回写：<b>决定后 7 天 vs 前 7 天</b> 流量 / 转化 / 销售额，减去同品类市场池同期变化 = 净效果；忽略单自动作对照组。</div>
+  </div>
+</div>
+
+<!-- ④ -->
+<div class="panel" id="p4">
+  <div class="card">
+    <h3><span class="ln">LAYER 04</span>复盘 · 昨日变化解释器（真实成文）</h3>
+    <div class="note">每天自动分析「为什么昨天卖多 / 卖少」，成文写飞书「解释日志」表。以下为 2026-09-27 <b>未经修改的系统输出</b>：</div>
+    <div class="explain">
+      <div class="who">EXPLAIN_DAILY · 2026-09-27 · 置信度：中</div>
+      <p>主因是<b>转化率下滑叠加多 SPU 断货</b>。证据：CVR 从 1.73% 降至 1.47%，转化效应 <span style="color:var(--bad);font-family:var(--mono)">−3206</span>；<b>10 个 SKU 断货</b>，凉亭 1094、办公桌 0287C 等归零共拖累超 3 千；<span class="dim">广告数据正常非停投。</span>置信度中，缺大盘数据难排除外部因素。</p>
+    </div>
+    <div class="note" style="margin-top:14px">系统同时给出的分项效应拆解（真实数值）：</div>
+    <div class="bars" id="effbars"></div>
+  </div>
+</div>
+
+<!-- ⑤ -->
+<div class="panel" id="p5">
+  <div class="card">
+    <h3><span class="ln">PROOF</span>下班时段售前客服 · AB 实测</h3>
+    <div class="note">Allegro 2026-06-01 ~ 09-04 下班时段全部售前线程（n=167）。首响 = 买家发问到首次响应；人工基线为机器人上线前（06-01~07-09）同口径中位。</div>
+    <div class="vs">
+      <div class="before">
+        <h4>BEFORE · 无人值守</h4>
+        <div class="big">733<small> min</small></div>
+        <div class="cap">售前咨询首响中位（≈12.2 小时，次日上班才回）</div>
+        <li>下班后成交占全天 66%，无人应答</li>
+        <li>买家提问隔夜积压，次日集中处理</li>
+      </div>
+      <div class="after">
+        <h4>AFTER · 机器人值守（2026-07-10 起）</h4>
+        <div class="big">2.2<small> min</small></div>
+        <div class="cap">首响中位（n=167）· FAQ 实答 + 无法自答升级工单</div>
+        <li>FAQ 实答线程 72h 转化 <b style="color:#fff">30.8%</b>（4/13）vs 仅 ACK 19.5%（30/154）</li>
+        <li>年化覆盖 ≈1,100 个原无人应答线程</li>
+      </div>
+    </div>
+    <div class="honest"><b>诚实边界：</b>72h 转化提升经双重差分检验后不能归因给机器人（在岗时段同期也在涨），本案例只申报首响时长与覆盖数——本 demo 与正文申报口径完全一致。</div>
+  </div>
+</div>
+
+<div class="foot">
+DATA · 飞书「决策日志（AI提案·人决定·7日回写）」表 · SQLite explain_daily / decision_log 台账（2026-09-04 起）· Allegro 客服 AB 抽数 898 线程 · 金额 PLN 含 VAT<br>
+本页为静态交互演示（真实台账数据回放），不模拟 AI 运行过程；系统真实运行界面见正文截图与飞书表 · 2026 AI 先锋全国大赛 · 海外赛道 · 陈瓯阳
+</div>
+
+</div>
+<script>
+// ---------- 真实数据（SQLite 台账导出 2026-09-29）----------
+const KPI=[
+ {v:'17,882',u:' PLN',l:'单日销售额（含 VAT）',d:'前7日均值 <b>19,673</b> → 环比 <span class="dn">−9.1%</span>'},
+ {v:'27',u:' 件',l:'单日销量',d:'件单价 662 PLN'},
+ {v:'1,841',u:'',l:'访客数',d:'自然 1,322 · 付费 519'},
+ {v:'1.47',u:'%',l:'转化率',d:'前值 1.73% · 转化效应 <span class="dn">−3206</span>'},
+ {v:'125',u:'',l:'加购数',d:'加购率 6.8%（行业健康带）'},
+];
+const L7={days:['09-21','09-22','09-23','09-24','09-25','09-26','09-27'],v:[32628,22029,13918,23008,17910,8714,17882]};
+const DL=[
+ {d:'09-27',spu:'1379',cat:'猫砂盆',act:'修 listing',why:'加购率 2.0% 只有中位 5.4% 的 36%',ev:'7日流量51 · 转化0.00% · 7日额0 · 付费占比75%'},
+ {d:'09-26',spu:'1021',cat:'办公桌',act:'开广告',why:'转化率 4.44% &gt; 同类 2.78%，付费流仅占 10%',ev:'流量135 · 转化4.44% · 加购成交55% · 7日额2432'},
+ {d:'09-26',spu:'0894',cat:'柜类',act:'修结账',why:'加购 11 但加购成交仅 0%（健康 25–38%）',ev:'流量212 · 转化0.00% · 7日额0 · 付费占比71%'},
+ {d:'09-26',spu:'0463',cat:'办公桌',act:'报活动',why:'转化率 2.78% 不输同类但流量 72 &lt; 中位 94',ev:'流量72 · 转化2.78% · 7日额940'},
+ {d:'09-24',spu:'0337A',cat:'凉亭',act:'调价',why:'件单价 1276 vs 市场 328（+289%）；加购率 1.3% &lt; 中位 6%',ev:'流量79 · 件单价1276 · 7日额382'},
+ {d:'09-24',spu:'1413',cat:'办公桌',act:'报活动',why:'[清库] 在库 8，近 14 天零成交，无到货 → 活动 / 清库',ev:'流量0 · 7日额0'},
+];
+const ACT=[['报活动',121],['库存',59],['调价',55],['修结账',40],['修listing',25],['开广告',23]];
+const EFF=[['断货效应',-3000],['转化效应',-3206],['广告（已排除）',0]];
+
+// ---------- tabs ----------
+document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>{
+  document.querySelectorAll('.tab').forEach(x=>x.classList.remove('on'));
+  document.querySelectorAll('.panel').forEach(x=>x.classList.remove('on'));
+  t.classList.add('on');document.getElementById(t.dataset.p).classList.add('on');
+});
+
+// ---------- KPI ----------
+document.getElementById('kpis').innerHTML=KPI.map(k=>`<div class="kpi">
+  <div class="v">${k.v}<small>${k.u}</small></div><div class="l">${k.l}</div><div class="d">${k.d}</div></div>`).join('');
+
+// ---------- 折线（发光 + 悬停十字线）----------
+(function(){
+  const svg=document.querySelector('#line7 svg'),H=210,W=1000,PL=14,PR=14,PT=26,PB=30;
+  const d=L7.v,mx=Math.max(...d)*1.12,mn=Math.min(...d)*.82;
+  const X=i=>PL+(W-PL-PR)*i/(d.length-1),Y=v=>PT+(H-PT-PB)*(1-(v-mn)/(mx-mn));
+  let s='';
+  for(let g=0;g<4;g++){const y=PT+(H-PT-PB)*g/3;s+=`<line x1="${PL}" y1="${y}" x2="${W-PR}" y2="${y}" stroke="#1d2949" stroke-dasharray="${g===3?'none':'3 5'}"/>`
+    +`<text x="${PL-4}" y="${y+4}" font-size="10" fill="#5f6d94" text-anchor="end" font-family="JetBrains Mono">${Math.round(mn+(mx-mn)*(1-g/3)/1000)}k</text>`;}
+  const pts=d.map((v,i)=>`${X(i)},${Y(v)}`).join(' ');
+  s+=`<polygon points="${PL},${H-PB} ${pts} ${W-PR},${H-PB}" fill="url(#g1)"/>`;
+  s+=`<defs><linearGradient id="g1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4d84d4" stop-opacity=".35"/><stop offset="1" stop-color="#4d84d4" stop-opacity="0"/></linearGradient></defs>`;
+  s+=`<polyline class="glow-line" points="${pts}" fill="none" stroke="#6ba0e8" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>`;
+  s+=`<polyline points="${pts}" fill="none" stroke="#fff" stroke-width="1" stroke-linejoin="round" opacity=".5"/>`;
+  d.forEach((v,i)=>{s+=`<circle cx="${X(i)}" cy="${Y(v)}" r="3.5" fill="#0d1220" stroke="#6ba0e8" stroke-width="2"/>`;
+    s+=`<text x="${X(i)}" y="${H-9}" font-size="10.5" fill="#5f6d94" text-anchor="middle" font-family="JetBrains Mono">${L7.days[i]}</text>`;});
+  svg.innerHTML=s;
+  const tip=document.querySelector('#line7 .tip');
+  svg.innerHTML+=d.map((v,i)=>`<rect class="hz" x="${X(i)-32}" y="0" width="64" height="${H}" fill="transparent" data-i="${i}"/>`).join('');
+  svg.addEventListener('mousemove',e=>{
+    const t=e.target.closest('.hz');if(!t){tip.style.display='none';return;}
+    const i=+t.dataset.i,r=svg.getBoundingClientRect(),x=X(i)/W*r.width,y=Y(d[i])/H*r.height;
+    tip.style.display='block';tip.style.left=x+'px';tip.style.top=(y-6)+'px';
+    tip.innerHTML=`<b>${L7.days[i]}</b> · ${d[i].toLocaleString()} PLN`;
+    svg.querySelectorAll('.xline').forEach(n=>n.remove());
+    svg.innerHTML+=`<line class="xline" x1="${X(i)}" y1="${PT-8}" x2="${X(i)}" y2="${H-PB}" stroke="#2c3a63" stroke-dasharray="3 4"/>`
+      +`<circle class="xline" cx="${X(i)}" cy="${Y(d[i])}" r="5.5" fill="#6ba0e8" stroke="#0d1220" stroke-width="2.5"/>`;
+  });
+  svg.addEventListener('mouseleave',()=>{tip.style.display='none';svg.querySelectorAll('.xline').forEach(n=>n.remove());});
+})();
+
+// ---------- 决策日志表 ----------
+document.querySelector('#dl tbody').innerHTML=DL.map((r,i)=>`<tr>
+  <td style="font-family:var(--mono);color:var(--ink3)">${r.d}</td><td><span class="spu">${r.spu}</span></td>
+  <td><span class="tag t-cat">${r.cat}</span></td><td><span class="tag t-act">${r.act}</span></td>
+  <td class="why">${r.why}</td><td class="evi">${r.ev}</td></tr>`).join('');
+
+// ---------- 条形（错峰生长动画）----------
+function bars(el,data,fmt){
+  const mx=Math.max(...data.map(x=>Math.abs(x[1])));
+  el.innerHTML=data.map((a,i)=>{
+    const w=Math.abs(a[1])/mx*100;
+    const cls=a[1]<0?'neg':(a[1]===0?'zero':'');
+    return `<div class="brow"><div class="bname">${a[0]}</div><div class="btrack">
+      <div class="bfill ${cls}" style="width:${Math.max(w,1.5)}%;animation-delay:${i*90}ms"></div></div>
+      <div class="bval">${fmt(a[1])}</div></div>`;
+  }).join('');
+}
+bars(document.getElementById('actbars'),ACT,v=>v+' 单');
+bars(document.getElementById('effbars'),EFF,v=>v===0?'0（已排除）':v.toLocaleString()+' PLN');
+// 切到面板时重播动画
+document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>{
+  const p=document.getElementById(t.dataset.p);
+  p.querySelectorAll('.bfill').forEach(b=>{b.style.animation='none';b.offsetHeight;b.style.animation='';});
+});
+</script>
+</body>
+</html>
