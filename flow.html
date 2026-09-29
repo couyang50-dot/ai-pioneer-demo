@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>长尾渠道 AI 值守系统 · 方案流程图</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&family=JetBrains+Mono:wght@600;800&display=swap');
+:root{
+  --c1:#4d84d4; --c2:#c96a42; --c3:#2fa87b; --c4:#8868cf;
+  --bg:#0d1220; --card:#141c31; --card2:#182242;
+  --line:#232f52; --line2:#2c3a63;
+  --ink:#e8ecf7; --ink2:#9aa7c7; --ink3:#5f6d94;
+  --good:#2fa87b; --warn:#d9a406; --bad:#e06058;
+  --mono:'JetBrains Mono',ui-monospace,monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Noto Sans SC',-apple-system,'PingFang SC',sans-serif;background:var(--bg);color:var(--ink);padding:34px 20px 50px;
+  background-image:radial-gradient(ellipse 80% 50% at 50% -10%,rgba(77,132,212,.13),transparent),radial-gradient(ellipse 60% 40% at 85% 110%,rgba(136,104,207,.08),transparent)}
+.wrap{max-width:1040px;margin:0 auto}
+h1{font-size:21px;font-weight:900;letter-spacing:1px;margin-bottom:4px;color:#fff}
+.sub{font-family:var(--mono);font-size:11px;color:var(--ink3);letter-spacing:1.5px;margin-bottom:26px}
+
+/* 主干：横向5层 */
+.layers{display:flex;flex-direction:column;gap:0}
+.lrow{display:flex;align-items:stretch;gap:0}
+.lbox{flex:1;border:1px solid var(--line2);border-radius:13px;padding:15px 17px;background:linear-gradient(180deg,var(--card2),var(--card));position:relative;transition:.25s}
+.lbox:hover{border-color:var(--c1);transform:translateY(-2px);box-shadow:0 8px 26px rgba(13,18,32,.6)}
+.lbox .no{font-family:var(--mono);font-size:10px;font-weight:800;letter-spacing:1.5px}
+.lbox h3{font-size:15.5px;font-weight:700;margin:4px 0 7px;color:#fff}
+.lbox p{font-size:11.8px;color:var(--ink2);line-height:1.75}
+.lbox p b{color:var(--ink);font-weight:600}
+.l1 .no{color:#4d84d4} .l2 .no{color:#c96a42} .l3 .no{color:#2fa87b} .l4 .no{color:#8868cf}
+
+/* 竖向箭头带 */
+.varrow{display:flex;justify-content:center;padding:2px 0}
+.varrow .stem{width:2px;height:22px;background:linear-gradient(180deg,transparent,var(--c1),transparent);position:relative}
+.varrow .stem::after{content:'▼';position:absolute;bottom:-9px;left:50%;transform:translateX(-50%);color:var(--c1);font-size:10px}
+
+/* 授权层内部双分支 */
+.branch{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:9px}
+.bcard{border-radius:9px;padding:9px 11px;font-size:11px;line-height:1.65}
+.bcard b{display:block;font-size:11.5px;margin-bottom:2px}
+.bcard .st{font-family:var(--mono);font-size:9.5px;letter-spacing:.5px}
+.b-l3{background:rgba(47,168,123,.09);border:1px solid rgba(47,168,123,.35)}
+.b-l3 b{color:#5ecf9d}.b-l3 .st{color:#5ecf9d}
+.b-l2{background:rgba(77,132,212,.10);border:1px solid rgba(77,132,212,.4)}
+.b-l2 b{color:#8ab6ee}.b-l2 .st{color:#8ab6ee}
+.bcard span{color:var(--ink2)}
+
+/* 回流线说明 */
+.loop{margin-top:20px;border:1px dashed var(--line2);border-radius:10px;padding:12px 15px;display:flex;align-items:center;gap:11px;background:rgba(20,28,49,.5)}
+.loop .ic{font-family:var(--mono);font-size:10px;color:var(--c4);border:1px solid rgba(136,104,207,.4);border-radius:6px;padding:3px 8px;background:rgba(136,104,207,.08);white-space:nowrap}
+.loop p{font-size:11.8px;color:var(--ink2);line-height:1.7}
+.loop p b{color:var(--ink)}
+
+.hard{margin-top:14px;display:flex;align-items:center;gap:11px;border:1px solid rgba(224,96,88,.35);border-radius:10px;padding:11px 15px;background:rgba(224,96,88,.06)}
+.hard .ic{font-family:var(--mono);font-size:10px;color:var(--bad);border:1px solid rgba(224,96,88,.4);border-radius:6px;padding:3px 8px;background:rgba(224,96,88,.08);white-space:nowrap}
+.hard p{font-size:11.8px;color:var(--ink2);line-height:1.7}
+.hard p b{color:var(--ink)}
+
+.foot{margin-top:24px;font-family:var(--mono);font-size:10px;color:var(--ink3);line-height:1.8;border-top:1px solid var(--line);padding-top:12px}
+@media(max-width:760px){.branch{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>长尾渠道 AI 值守系统 · 方案流程图</h1>
+  <div class="sub">SAME ENGINE · TWO AUTHORITY LEVELS · ONE LEDGER</div>
+
+  <div class="layers">
+    <div class="lrow"><div class="lbox l1">
+      <div class="no">LAYER 01</div><h3>感知层 · 每日数据</h3>
+      <p>ERP 库存 · 海上在途 · 超库龄周表 · <b>13 渠道订单</b>（Allegro / Cdiscount 15 分钟直拉）· 飞书指导价底线 · ManoMano 竞争价接口 · 平台市场榜单</p>
+    </div></div>
+    <div class="varrow"><div class="stem"></div></div>
+
+    <div class="lrow"><div class="lbox l2">
+      <div class="no">LAYER 02</div><h3>判断层 · AI 决策</h3>
+      <p>对每个「SKU × 渠道」输出：上留下排序 · 库存分配 · 定价 · 内容生成 · 异常三分类。<b>硬约束由代码算，软判断与生成由模型承担</b>，每条带理由与置信度</p>
+    </div></div>
+    <div class="varrow"><div class="stem"></div></div>
+
+    <div class="lrow"><div class="lbox l3">
+      <div class="no">LAYER 03</div><h3>授权层 · 两级闸门</h3>
+      <div class="branch">
+        <div class="bcard b-l3"><b>L3 · 长尾渠道</b><span>策略卡内<b style="display:inline">自动执行</b>：人批一次策略，卡内自治，越界叫人</span><div class="st" style="margin-top:4px">2026-10-18 起灰度</div></div>
+        <div class="bcard b-l2"><b>L2 · 主战场渠道</b><span>飞书审批卡，人翻「已同意」才执行；只出提案不动前台</span><div class="st" style="margin-top:4px">现行 · 323/323 条人工</div></div>
+      </div>
+    </div></div>
+    <div class="varrow"><div class="stem"></div></div>
+
+    <div class="lrow"><div class="lbox l4">
+      <div class="no">LAYER 04</div><h3>执行与回写层</h3>
+      <p>调平台接口执行上下架 · 库存 · 价格 · 传图 · 发货回传；<b>每条动作写决策日志</b>，14 天后回填动销、退货、驳回、超卖</p>
+    </div></div>
+  </div>
+
+  <div class="loop">
+    <div class="ic">WRITEBACK LOOP</div>
+    <p><b>决策日志回流判断层：</b>每条决定（执行或忽略）满 7 天自动回写净效果 —— 决定后 7 天 vs 前 7 天的流量 / 转化 / 销售额，减去同品类市场池同期变化；被忽略的提案自动成为对照组。判断层据回写结果自我校准排序权重。</p>
+  </div>
+
+  <div class="hard">
+    <div class="ic">GUARDRAIL</div>
+    <p><b>硬数字不经模型：</b>库存非负 · 售价不低于底线价 · feed 完整性 · 合规黑名单 —— 全部由代码硬门拦截，模型碰不到这些字段。</p>
+  </div>
+
+  <div class="foot">2026 AI 先锋全国大赛 · 海外赛道 · 长尾渠道 AI 值守系统 · 与在线交互 Demo 同源配色（couyang50-dot.github.io/ai-pioneer-demo/）· 陈瓯阳</div>
+</div>
+</body>
+</html>
